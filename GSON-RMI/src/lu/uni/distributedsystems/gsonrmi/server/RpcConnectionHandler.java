@@ -1,0 +1,225 @@
+package lu.uni.distributedsystems.gsonrmi.server;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.Socket;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
+
+import com.google.code.gsonrmi.RpcRequest;
+import com.google.code.gsonrmi.RpcResponse;
+import com.google.code.gsonrmi.server.RpcTarget;
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonStreamParser;
+
+/**
+ * A handler for a single JSON-RPC server connection.
+ * Objects of this class each run in their own separate thread.
+ */
+public class RpcConnectionHandler extends Thread {
+
+	private Socket socket;
+	private RpcTarget rpcTarget;
+	private Gson gson;
+	private JsonStreamParser in;
+	private Writer out;
+	private Interceptor interceptor;
+	private IPEndpoint remoteIPEndpoint;
+	private Random rnd = new Random();
+	private String partnerID; // the (unique) ID of the partner being connected with
+
+	// directory of service modes, per partnerID
+	private static Map<String, ServiceMode> serviceModes = new ConcurrentHashMap<String, ServiceMode>();
+	
+	private static Logger logger = Logger.getLogger(RpcConnectionHandler.class.getName());
+
+	/**
+	 * Constructs a connection handler for the given socket.
+	 * 
+	 * @param socket		socket connected to some client
+	 * @param rpcTarget		the RpcTarget of the associated JSON-RPC server implementation
+	 * @param gson			the Gson object to use throughout request processing
+	 * @param interceptor	a request/reply interceptor, or null if none is required
+	 * @throws IOException	if there is an issue communicating via the socket
+	 */
+	public RpcConnectionHandler(Socket socket, RpcTarget rpcTarget, Gson gson, Interceptor interceptor) throws IOException {
+		this.socket = socket;
+		this.rpcTarget = rpcTarget;
+		this.gson = gson;
+		this.interceptor = interceptor;
+		remoteIPEndpoint = new IPEndpoint(socket.getInetAddress(), socket.getPort());
+		in = new JsonStreamParser(new InputStreamReader(socket.getInputStream(), "utf-8"));
+		out = new OutputStreamWriter(socket.getOutputStream(), "utf-8");
+		setDaemon(true);
+	}
+	
+	/**
+	 * Initialize service mode of a connection.
+	 * In case the partner id is new, i.e. if it's the first connection with some partner,
+	 * set mode to RELIABLE. In case the partner is known, i.e. in case of a reconnect,
+	 * the mode depends on the previous setting. If it was DISCONNECT_BEFORE_PROCESSING
+	 * of DISCONNECT_BEFORE_REPLY, reset mode to RELIABLE. Otherwise, i.e. in case the
+	 * previous mode was RELIABLE or RANDOM, keep that mode.
+	 * 
+	 * @param partnerID unique ID of the partner
+	 */
+	public void initializeServiceMode(String partnerID) {
+		ServiceMode mode;
+		
+		// if partnerID is new, default service mode is RELIABLE
+		if (!serviceModes.containsKey(partnerID))
+			mode = ServiceMode.RELIABLE;
+		else {
+			// fetch current mode
+			mode = serviceModes.get(partnerID);
+			// if mode has been RANDOM, keep it
+			// if mode has been DISCONNECT*, reset to RELIABLE
+			// otherwise, i.e. in case of RELIABLE or RANDOM, keep previous mode
+			if (mode == ServiceMode.DISCONNECT_BEFORE_PROCESSING || mode == ServiceMode.DISCONNECT_BEFORE_REPLY)
+				mode = ServiceMode.RELIABLE;
+		}
+		serviceModes.put(partnerID, mode);
+		logger.info("initialize service mode of: " + partnerID + " to: " + mode);
+	}
+
+	/**
+	 * Allows to set the service mode for a certain partner, determining
+	 * how requests from that connection will be processed.
+	 * 
+	 * @param partnerID	unique ID of the partner
+	 * @param mode		mode in which subsequent requests shall be processed
+	 */
+	public static void setServiceMode(String partnerID, ServiceMode mode) {
+        logger.info("set mode of: " + partnerID + " to: " + mode);
+        // remember service mode selected
+        serviceModes.put(partnerID, mode);
+	}
+	
+	/**
+	 * Retrieves the currently selected service mode for the given partner.
+	 * In case no service mode has been set explicitly yet, the default mode returned
+	 * is RELIABLE.
+	 * 
+	 * @param partnerID	unique ID of the partner
+	 * @return			current mode in which requests shall be processed
+	 */
+	public static ServiceMode getServiceMode(String partnerID) {
+		// retrieve service mode for a certain partner
+		if (serviceModes.containsKey(partnerID))
+			return serviceModes.get(partnerID);
+		// default service mode is RELIABLE
+		return ServiceMode.RELIABLE;
+	}
+
+	/**
+	 * Main loop of this connection handler, performing request handling as follows:
+	 * <p>
+	 * Receive a JSON-RPC request via the socket connection. Close the
+	 * connection in case the current service mode is DISCONNECT_BEFORE_PROCESSING.
+	 * Otherwise, forward the request to the interceptor. Either the interceptor
+	 * returns a response for that request, or the response is generated by handling the
+	 * request (via the RpcTarget specified at construction time). The response is forwarded
+	 * to the interceptor. In case the current service mode is DISCONNECT_BEFORE_REPLY,
+	 * the connection is closed. Otherwise, the response is sent back via
+	 * the socket to the caller.
+	 */
+	@Override
+	public void run() {
+		try {
+			// initialize connection
+			// read partnerID from the socket
+			PartnerID partnerIDObject = gson.fromJson(in.next(), PartnerID.class);
+			partnerID = partnerIDObject.getPartnerID();
+			logger.info("handling connection from: " + partnerID + " at " + remoteIPEndpoint);
+			
+			// send back OK reply
+			out.write("{'result':'OK'}");
+			out.flush();
+			
+			// initialize service mode for this connection
+			initializeServiceMode(partnerID);
+			
+			// main request processing loop
+			while (in.hasNext()) {
+				// fetch request from the socket
+				RpcRequest request = gson.fromJson(in.next(), RpcRequest.class);
+
+				// determine current service mode
+				ServiceMode mode = serviceModes.get(partnerID);
+				
+				// in case of RANDOM service behavior, randomly pick how to handle the current request 
+				if (mode == ServiceMode.RANDOM) {
+					switch (rnd.nextInt(3)) {
+					case 0:
+						mode = ServiceMode.RELIABLE;
+						break;
+					case 1:
+						mode = ServiceMode.DISCONNECT_BEFORE_PROCESSING;
+						break;
+					case 2:
+						mode = ServiceMode.DISCONNECT_BEFORE_REPLY;
+						break;
+					}
+                    logger.info("handling request: " + gson.toJson(request) + " from host: " + remoteIPEndpoint + " in randomly chosen mode: " + mode);
+                }
+                else
+                {
+                    logger.info("handling request: " + gson.toJson(request) + " from host: " + remoteIPEndpoint + " in mode: " + mode);
+                }
+				
+				// simulate the case where a request is not received (and thus not processed)
+				if (mode == ServiceMode.DISCONNECT_BEFORE_PROCESSING) {
+					throw new IOException("explicit disconnect before processing request");
+				}
+				
+				RpcResponse response = null;
+				
+				// intercept the request; might return a response to be sent back ...
+				if (interceptor != null)
+					response = interceptor.interceptRequest(request);
+
+				// ... or null in case the request shall be processed in the normal way 
+				if (response == null)
+					response = rpcTarget.doInvoke(request);
+
+				// intercept the response (even in case it was a stored response
+				// returned by the request interceptor)
+				if (interceptor != null)
+					interceptor.interceptResponse(request, response);
+				
+				// simulate the case where the request has been processed, but the
+				// reply could not be sent back
+                if (mode == ServiceMode.DISCONNECT_BEFORE_REPLY)
+                {
+                    throw new IOException("explicit disconnect before reply");
+                }
+                
+                // send back reply
+                logger.info("sending response: " + gson.toJson(response) + " for request: " + gson.toJson(request) + " to host: " + remoteIPEndpoint);
+				out.write(gson.toJson(response));
+				out.flush();
+			}
+		}
+		catch (IOException e) {
+			logger.info("closing connection with: " + remoteIPEndpoint);
+		}
+		catch (JsonParseException e) {
+			System.err.println("Error parsing incoming JSON message");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				socket.close();
+			}
+			catch (IOException e) {
+			}
+		}
+	}
+
+
+}
