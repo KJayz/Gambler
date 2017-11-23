@@ -104,7 +104,7 @@ public class GamblerServer extends RemoteControllableServer {
 	public String receiveMatch(String bookieID, int matchID, String teamA, int oddsA, String teamB, int oddsB, int limit) {
 		
 		AvailableMatch match = new AvailableMatch(bookieID, matchID, teamA, oddsA, teamB, oddsB, limit);
-		
+		gambler.addMatch(match);
 		return "Match with ID: "+matchID+" received from bookie: "+bookieID;
 	}
 
