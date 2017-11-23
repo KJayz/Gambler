@@ -208,7 +208,7 @@ public class Gambler {
 		
 		PlaceBetResult response = bookieConnections.get(bookieID).bet(bookieID, matchID, team, stake, odds);
 		
-		if(response) {
+		if(response == PlaceBetResult.ACCEPTED) {
 			Bet bet = new Bet(bookieID, matchID, team, stake, odds);
 			bets.add(bet);
 			
