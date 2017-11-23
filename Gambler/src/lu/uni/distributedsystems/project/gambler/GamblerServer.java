@@ -93,6 +93,20 @@ public class GamblerServer extends RemoteControllableServer {
 		System.out.println("sayHelloToGambler(" + bookieName + ")");
 		return "Gambler says: Hello, bookie " + bookieName;
 	}
+	
+	/**
+	 * Method which captures a match created by a bookie.
+	 * 
+	 * @param
+	 * 
+	 */
+	@RMI
+	public String receiveMatch(String bookieID, int matchID, String teamA, int oddsA, String teamB, int oddsB, int limit) {
+		
+		AvailableMatch match = new AvailableMatch(bookieID, matchID, teamA, oddsA, teamB, oddsB, limit);
+		
+		return "Match with ID: "+matchID+" received from bookie: "+bookieID;
+	}
 
 	// TODO insert the methods that can be invoked remotely via JSON-RPC on this gambler
 	

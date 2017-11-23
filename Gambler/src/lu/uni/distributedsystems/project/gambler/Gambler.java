@@ -171,8 +171,7 @@ public class Gambler {
 		// TODO show all open matches of all connected bookies since having connected
 		
 		//Prints all info for each match
-		while(availableMatches.iterator().hasNext()) {
-			AvailableMatch temp = availableMatches.iterator().next();
+		for(AvailableMatch temp : availableMatches) {
 			System.out.println("Bookie: "+temp.getBookieID());
 			System.out.println("MatchID: "+temp.getMatchID());
 			System.out.println("Team A: "+temp.getTeamA());
@@ -225,8 +224,7 @@ public class Gambler {
 	 */
 	public void showBets() {
 		
-		while(bets.iterator().hasNext()) {
-			Bet temp = bets.iterator().next();
+		for(Bet temp : bets) {
 			System.out.println("Bookie: "+temp.getBookieID());
 			System.out.println("Match ID: "+temp.getMatchID());
 			System.out.println("Team: "+temp.getTeam());
@@ -236,6 +234,32 @@ public class Gambler {
 		}
 		
 		System.out.println("All bets have been listed!");
+	}
+	
+	/**
+	 * Adds a match to the list of available matches for this gambler.
+	 * 
+	 * @param match The match to be added to the list
+	 */
+	public void addMatch(AvailableMatch match) {
+		availableMatches.add(match);
+	}
+	
+	/**
+	 * Removes a match with the given ID. This implementation assumes there are no duplicate matchIDs
+	 * 
+	 * @param matchID The ID of the match to be removed
+	 */
+	
+	public void removeMatch(int matchID) {
+		
+		for(int i = 0; i<availableMatches.size();i++) {
+			AvailableMatch match = availableMatches.get(i);
+			if(match.getMatchID() == matchID) {
+				availableMatches.remove(i);
+				break;
+			}
+		}
 	}
 	
 	/**
