@@ -207,7 +207,7 @@ public class Gambler {
 		
 		PlaceBetResult response = bookieConnections.get(bookieID).bet(bookieID, matchID, team, stake, odds);
 		
-		if(response == PlaceBetResult.ACCEPTED) {
+		if(response.equals(PlaceBetResult.ACCEPTED)) {
 			Bet bet = new Bet(bookieID, matchID, team, stake, odds);
 			bets.add(bet);
 			
@@ -215,7 +215,7 @@ public class Gambler {
 			System.out.println("on match with ID: "+ matchID);
 		} else {
 			System.out.println("Bet rejected. Bookie returned the following info: ");
-			System.out.println("--" + response + "--");
+			System.out.println("--" + response.toString() + "--");
 		}
 	}
 
