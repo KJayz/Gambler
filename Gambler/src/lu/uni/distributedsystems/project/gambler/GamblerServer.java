@@ -104,10 +104,32 @@ public class GamblerServer extends RemoteControllableServer {
 	public String receiveMatch(String bookieID, int matchID, String teamA, int oddsA, String teamB, int oddsB, int limit) {
 		
 		AvailableMatch match = new AvailableMatch(bookieID, matchID, teamA, oddsA, teamB, oddsB, limit);
-		gambler.addMatch(match);
+		gambler.availableMatches.add(match);
 		return "Match with ID: "+matchID+" received from bookie: "+bookieID;
 	}
 
+	
+	@RMI
+	public String changeOdds(String bookieID, int matchID, String team, int odds) {
+		
+		for(AvailableMatch match : gambler.availableMatches) {
+			if(match.getBookieID().equals(bookieID) && match.getMatchID() == matchID) {
+				if(match.getTeamA().equals(team)) {
+					match.setOddsA(odds);
+					return "BookieID: " + " | MatchID: " + matchID + " | TeamA: " + team + " | New odds: " + odds;
+				}
+				
+				if(match.getTeamB().equals(team)) {
+					match.setOddsB(odds);
+					return "BookieID: " + " | MatchID: " + matchID + " | TeamB: " + team + " | New odds: " + odds;
+				}
+			}
+
+		}
+		
+		//If gambler does not have the stated match or if spelling mistake by bookie
+		return "Match not found.";
+	}
 	// TODO insert the methods that can be invoked remotely via JSON-RPC on this gambler
 	
 	

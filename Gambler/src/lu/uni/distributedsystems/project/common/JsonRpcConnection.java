@@ -120,8 +120,18 @@ public class JsonRpcConnection {
 		
 		request.method = method;
 		request.params = params;
+		
 		// TODO make sure to assign an appropriate message-id
-		request.id = new Parameter(42);
+		
+		switch (method) {
+		case "connect":
+			request.id = new Parameter(1);
+			break;
+		case "bet":
+			request.id = new Parameter(2);
+			break;
+			// Add when creating new types of requests
+		}
 
 		try {
 			logger.info("sending request: " + gson.toJson(request));
@@ -139,6 +149,8 @@ public class JsonRpcConnection {
 		catch (Exception ex) {
 			// TODO handle lost connections
 			// connection to JSON-RPC server is lost
+			
+			System.err.print("Your last request was not received. Try again in a few moments. If the problem persists, check your connection with the server.");
 			logger.info("server connection dropped");
 		}
 		return response;

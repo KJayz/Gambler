@@ -55,13 +55,13 @@ public class Gambler {
 	/**
 	 * an array containing the information of all the bets the gambler has made
 	 */
-	private ArrayList<Bet> bets = new ArrayList<Bet>();
+	ArrayList<Bet> bets = new ArrayList<Bet>();
 	
 	/**
 	 * an array containing the information of all matches which the 
 	 * gambler knows of and hasn't bet on yet
 	 */
-	private ArrayList<AvailableMatch> availableMatches = new ArrayList<AvailableMatch>();
+	ArrayList<AvailableMatch> availableMatches = new ArrayList<AvailableMatch>();
 
 	/**
 	 * Construct a new gambler instance, including to create and start
@@ -236,31 +236,6 @@ public class Gambler {
 		System.out.println("All bets have been listed!");
 	}
 	
-	/**
-	 * Adds a match to the list of available matches for this gambler.
-	 * 
-	 * @param match The match to be added to the list
-	 */
-	public void addMatch(AvailableMatch match) {
-		availableMatches.add(match);
-	}
-	
-	/**
-	 * Removes a match with the given ID. This implementation assumes there are no duplicate matchIDs
-	 * 
-	 * @param matchID The ID of the match to be removed
-	 */
-	
-	public void removeMatch(int matchID) {
-		
-		for(int i = 0; i<availableMatches.size();i++) {
-			AvailableMatch match = availableMatches.get(i);
-			if(match.getMatchID() == matchID) {
-				availableMatches.remove(i);
-				break;
-			}
-		}
-	}
 	
 	/**
 	 * Configuration of the logging messages generated during runtime. 
