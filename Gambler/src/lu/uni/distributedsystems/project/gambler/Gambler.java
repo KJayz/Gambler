@@ -172,14 +172,14 @@ public class Gambler {
 		
 		//Prints all info for each match
 		for(AvailableMatch temp : availableMatches) {
-			System.out.println("Bookie: "+temp.getBookieID());
-			System.out.println("MatchID: "+temp.getMatchID());
-			System.out.println("Team A: "+temp.getTeamA());
-			System.out.println("Odds A: "+temp.getOddsA());
-			System.out.println("Team B: "+temp.getTeamB());
-			System.out.println("Odds B: "+temp.getOddsB());
-			System.out.println("Limit: "+temp.getLimit());
-			System.out.println("---------");
+			System.out.print("Bookie: "+temp.getBookieID());
+			System.out.print(" MatchID: "+temp.getMatchID());
+			System.out.print(" Team A: "+temp.getTeamA());
+			System.out.print(" Odds A: "+temp.getOddsA());
+			System.out.print(" Team B: "+temp.getTeamB());
+			System.out.print(" Odds B: "+temp.getOddsB());
+			System.out.print(" Limit: "+temp.getLimit());
+			System.out.print("\n---------\n");
 		}
 		
 		System.out.println("All matches have been listed!");
@@ -211,8 +211,7 @@ public class Gambler {
 			Bet bet = new Bet(bookieID, matchID, team, stake, odds);
 			bets.add(bet);
 			
-			System.out.println("Bet made with bookie " + bookieID);
-			System.out.println("on match with ID: "+ matchID);
+			System.out.println("Bet made with bookie " + bookieID + "on match with ID: "+ matchID);
 		} else {
 			System.out.println("Bet rejected. Bookie returned the following info: ");
 			System.out.println("--" + response.toString() + "--");
@@ -225,12 +224,12 @@ public class Gambler {
 	public void showBets() {
 		
 		for(Bet temp : bets) {
-			System.out.println("Bookie: "+temp.getBookieID());
-			System.out.println("Match ID: "+temp.getMatchID());
-			System.out.println("Team: "+temp.getTeam());
-			System.out.println("Odds: "+temp.getOdds());
-			System.out.println("Stake: "+temp.getStake());
-			System.out.println("---------");
+			System.out.print("Bookie: "+temp.getBookieID());
+			System.out.print(" Match ID: "+temp.getMatchID());
+			System.out.print(" Team: "+temp.getTeam());
+			System.out.print(" Odds: "+temp.getOdds());
+			System.out.print(" Stake: "+temp.getStake());
+			System.out.print("\n---------\n");
 		}
 		
 		System.out.println("All bets have been listed!");

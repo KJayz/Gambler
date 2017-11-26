@@ -138,6 +138,32 @@ public class GamblerServer extends RemoteControllableServer {
 		//If gambler does not have the stated match or if spelling mistake by bookie
 		return "Match not found.";
 	}
+	
+	@RMI
+	public String endBetPhase(int matchID, String winningTeam, float payout) {
+		for(Bet bet : gambler.bets) {
+			if(bet.getMatchID() == matchID) {
+				if(bet.getTeam().equals(winningTeam)) {
+					//Have to round since payout is a float and the wallet contains int
+					int money = Math.round(payout);
+					gambler.fillWallet(money);
+					System.out.println("Match: " + matchID + " finished. You earned "+ money+ " !");
+				}
+				//matchID is unique
+				break;
+			}
+			
+			
+		}
+		
+		//Cleanup
+		for(int i = 0;i<gambler.availableMatches.size();i++) {
+			if(gambler.availableMatches.get(i).getMatchID() == matchID) {
+				gambler.availableMatches.remove(i);
+			}
+		}
+		return "endBetPhase method received by: " + gambler.getGamblerID();
+	}
 	// TODO insert the methods that can be invoked remotely via JSON-RPC on this gambler
 	
 	
