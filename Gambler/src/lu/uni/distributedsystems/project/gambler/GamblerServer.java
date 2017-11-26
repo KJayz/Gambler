@@ -157,9 +157,9 @@ public class GamblerServer extends RemoteControllableServer {
 		}
 		
 		//Cleanup
-		for(int i = 0;i<gambler.availableMatches.size();i++) {
-			if(gambler.availableMatches.get(i).getMatchID() == matchID) {
-				gambler.availableMatches.remove(i);
+		for(int i = 0;i<gambler.bets.size();i++) {
+			if(gambler.bets.get(i).getMatchID() == matchID) {
+				gambler.bets.remove(i);
 			}
 		}
 		return "endBetPhase method received by: " + gambler.getGamblerID();
