@@ -32,6 +32,7 @@ public class BetCommand extends Command {
 	public void showHelp() {
 		System.out.println("bet [bookie-id] [match-id] [team] [stake] [odds]");
 		System.out.println("    place a bet with some bookie");
+		System.out.println("    make sure decimal numbers are separated using a '.' and not ','");
 	}
 
 }

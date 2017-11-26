@@ -5,9 +5,9 @@ public class AvailableMatch {
 	private String bookieID;
 	private int matchID;
 	private String teamA;
-	private int oddsA;
+	private float oddsA;
 	private String teamB;
-	private int oddsB;
+	private float oddsB;
 	private int limit;
 	
 	public AvailableMatch(String bookieID, int matchID, String teamA,
@@ -54,19 +54,19 @@ public class AvailableMatch {
 		this.teamB = teamB;
 	}
 
-	public int getOddsB() {
+	public float getOddsB() {
 		return oddsB;
 	}
 
-	public void setOddsB(int oddsB) {
+	public void setOddsB(float oddsB) {
 		this.oddsB = oddsB;
 	}
 
-	public int getOddsA() {
+	public float getOddsA() {
 		return oddsA;
 	}
 
-	public void setOddsA(int oddsA) {
+	public void setOddsA(float oddsA) {
 		this.oddsA = oddsA;
 	}
 

@@ -118,7 +118,7 @@ public class GamblerServer extends RemoteControllableServer {
 	 * @return Response message to the bookie
 	 */
 	@RMI
-	public String setOdds(String bookieID, int matchID, String team, int odds) {
+	public String setOdds(String bookieID, int matchID, String team, float odds) {
 		
 		for(AvailableMatch match : gambler.availableMatches) {
 			if(match.getBookieID().equals(bookieID) && match.getMatchID() == matchID) {
@@ -157,15 +157,17 @@ public class GamblerServer extends RemoteControllableServer {
 		int money=Math.round(payout);
 		if(money>0) {
 			gambler.fillWallet(money);
+			System.out.println("Match: " + matchID + " finished. You earned "+ money+ " !");
 		}
-		System.out.println("Match: " + matchID + " finished. You earned "+ money+ " !");
+		
 		//Cleanup
 		for(int i = 0;i<gambler.bets.size();i++) {
 			if(gambler.bets.get(i).getMatchID() == matchID) {
 				gambler.bets.remove(i);
 			}
 		}
-		//deletes available match?
+		
+		//If gambler didn't bet, match needs to be removed from available matches list
 		for(AvailableMatch match : gambler.availableMatches) {
 			if (match.getMatchID()==matchID) {
 				gambler.availableMatches.remove(match);

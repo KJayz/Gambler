@@ -180,14 +180,14 @@ public class Gambler {
 		// TODO show all open matches of all connected bookies since having connected
 
 		// Prints all info for each match
-		for (AvailableMatch temp : availableMatches) {
-			System.out.print("Bookie: " + temp.getBookieID());
-			System.out.print(" MatchID: " + temp.getMatchID());
-			System.out.print(" Team A: " + temp.getTeamA());
-			System.out.print(" Odds A: " + temp.getOddsA());
-			System.out.print(" Team B: " + temp.getTeamB());
-			System.out.print(" Odds B: " + temp.getOddsB());
-			System.out.print(" Limit: " + temp.getLimit());
+		for (AvailableMatch match : availableMatches) {
+			System.out.print("Bookie: " + match.getBookieID());
+			System.out.print(" MatchID: " + match.getMatchID());
+			System.out.print(" Team A: " + match.getTeamA());
+			System.out.print(" Odds A: " + match.getOddsA());
+			System.out.print(" Team B: " + match.getTeamB());
+			System.out.print(" Odds B: " + match.getOddsB());
+			System.out.print(" Limit: " + match.getLimit());
 			System.out.print("\n---------\n");
 		}
 
@@ -245,12 +245,12 @@ public class Gambler {
 	 */
 	public void showBets() {
 
-		for (Bet temp : bets) {
-			System.out.print("Bookie: " + temp.getBookieID());
-			System.out.print(" Match ID: " + temp.getMatchID());
-			System.out.print(" Team: " + temp.getTeam());
-			System.out.print(" Odds: " + temp.getOdds());
-			System.out.print(" Stake: " + temp.getStake());
+		for (Bet bet : bets) {
+			System.out.print("Bookie: " + bet.getBookieID());
+			System.out.print(" Match ID: " + bet.getMatchID());
+			System.out.print(" Team: " + bet.getTeam());
+			System.out.print(" Odds: " + bet.getOdds());
+			System.out.print(" Stake: " + bet.getStake());
 			System.out.print("\n---------\n");
 		}
 

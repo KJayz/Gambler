@@ -87,9 +87,9 @@ public class BookieConnection extends JsonRpcConnection {
 	 * @param odds the odds of the team winning the match
 	 */
 	
-	public PlaceBetResult bet(String bookieID, int matchID, String team, int stake, float odds) {
+	public PlaceBetResult bet(String gamblerID, int matchID, String team, int stake, float odds) {
 		Parameter[] params = new Parameter[] {
-				new Parameter(bookieID),
+				new Parameter(gamblerID),
 				new Parameter(matchID),
 				new Parameter(team),
 				new Parameter(stake),
