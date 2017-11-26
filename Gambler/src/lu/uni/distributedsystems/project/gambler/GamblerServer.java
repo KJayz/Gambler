@@ -101,16 +101,24 @@ public class GamblerServer extends RemoteControllableServer {
 	 * 
 	 */
 	@RMI
-	public String receiveMatch(String bookieID, int matchID, String teamA, int oddsA, String teamB, int oddsB, int limit) {
+	public String startBetPhase(String bookieID, int matchID, String teamA, int oddsA, String teamB, int oddsB, int limit) {
 		
 		AvailableMatch match = new AvailableMatch(bookieID, matchID, teamA, oddsA, teamB, oddsB, limit);
 		gambler.availableMatches.add(match);
 		return "Match with ID: "+matchID+" received from bookie: "+bookieID;
 	}
 
-	
+	/**
+	 * Method which captures a change in the odds of a match.
+	 * 
+	 * @param bookieID The bookie who's changing the odds
+	 * @param matchID The match who's odds are being changed
+	 * @param team The team involved
+	 * @param odds The new odds
+	 * @return Response message to the bookie
+	 */
 	@RMI
-	public String changeOdds(String bookieID, int matchID, String team, int odds) {
+	public String setOdds(String bookieID, int matchID, String team, int odds) {
 		
 		for(AvailableMatch match : gambler.availableMatches) {
 			if(match.getBookieID().equals(bookieID) && match.getMatchID() == matchID) {
