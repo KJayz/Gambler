@@ -100,6 +100,13 @@ public class BookieConnection extends JsonRpcConnection {
 		// via this BookieConnection
 		RpcResponse response = handleJsonRpcRequest("bet",params);
 		
+		//Retry the JsonRpcRequest in case one dropped accidentally
+		int attempts = 0;
+		if(response == null && attempts <3) {
+			attempts++;
+			response = handleJsonRpcRequest("bet",params);
+		}
+		
 		// response is either accepted or rejected for a reason
 		// See PlaceBetResult enum for possiblities
 		PlaceBetResult bookieResponse = response.result.getValue(PlaceBetResult.class, getGson());

@@ -151,7 +151,6 @@ public class JsonRpcConnection {
 			// connection to JSON-RPC server is lost
 			
 			System.err.print("Your last request was not received. Try again in a few moments. If the problem persists, check your connection with the server.");
-			logger.info("server connection dropped");
 		}
 		return response;
 	}

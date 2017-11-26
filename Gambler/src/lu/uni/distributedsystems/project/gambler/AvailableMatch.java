@@ -11,7 +11,7 @@ public class AvailableMatch {
 	private int limit;
 	
 	public AvailableMatch(String bookieID, int matchID, String teamA,
-			int oddsA, String teamB, int oddsB, int limit) {
+			float oddsA, String teamB, float oddsB, int limit) {
 		
 		this.setBookieID(bookieID);
 		this.setMatchID(matchID);

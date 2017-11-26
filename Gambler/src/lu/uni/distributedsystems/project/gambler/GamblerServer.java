@@ -101,7 +101,14 @@ public class GamblerServer extends RemoteControllableServer {
 	 * 
 	 */
 	@RMI
-	public String startBetPhase(String bookieID, int matchID, String teamA, int oddsA, String teamB, int oddsB, int limit) {
+	public String startBetPhase(String bookieID, int matchID, String teamA, float oddsA, String teamB, float oddsB, int limit) {
+		
+		//Duplicate check
+		for(AvailableMatch match : gambler.availableMatches) {
+			if(match.getBookieID().equals(bookieID) && match.getMatchID() == matchID) {
+				return "Match already exists";
+			}
+		}
 		
 		AvailableMatch match = new AvailableMatch(bookieID, matchID, teamA, oddsA, teamB, oddsB, limit);
 		gambler.availableMatches.add(match);
@@ -141,29 +148,21 @@ public class GamblerServer extends RemoteControllableServer {
 	
 	@RMI
 	public String endBetPhase(String bookieID, int matchID, String winningTeam, float payout) {
-		/*for(Bet bet : gambler.bets) {
-			if(bet.getMatchID() == matchID) {
-				if(bet.getTeam().equals(winningTeam)) {
-					//Have to round since payout is a float and the wallet contains int
-					int money = Math.round(payout);
-					gambler.fillWallet(money);
-					System.out.println("Match: " + matchID + " finished. You earned "+ money+ " !");
-				}
-				//matchID is unique
-				break;
-			}
-		}*/
 		
 		int money=Math.round(payout);
-		if(money>0) {
-			gambler.fillWallet(money);
-			System.out.println("Match: " + matchID + " finished. You earned "+ money+ " !");
-		}
 		
-		//Cleanup
+		
+		//Remove the bet from gambler's bets since it has ended
 		for(int i = 0;i<gambler.bets.size();i++) {
 			if(gambler.bets.get(i).getMatchID() == matchID) {
 				gambler.bets.remove(i);
+				
+				if(money>0) {
+					gambler.fillWallet(money);
+					System.out.println("Match: " + matchID + " finished. You earned "+ money+ " !");
+				}
+				
+				break;
 			}
 		}
 		

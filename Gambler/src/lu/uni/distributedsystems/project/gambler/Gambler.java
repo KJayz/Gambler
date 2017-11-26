@@ -220,7 +220,7 @@ public class Gambler {
 		// hint: use the PlaceBetResult enum to cover the different cases that can occur
 		// when placing a bet
 
-		PlaceBetResult response = bookieConnections.get(bookieID).bet(bookieID, matchID, team, stake, odds);
+		PlaceBetResult response = bookieConnections.get(bookieID).bet(gamblerID, matchID, team, stake, odds);
 
 		if (response.equals(PlaceBetResult.ACCEPTED)) {
 			Bet bet = new Bet(bookieID, matchID, team, stake, odds);
