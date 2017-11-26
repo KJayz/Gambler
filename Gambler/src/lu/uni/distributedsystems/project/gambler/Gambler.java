@@ -211,6 +211,13 @@ public class Gambler {
 			Bet bet = new Bet(bookieID, matchID, team, stake, odds);
 			bets.add(bet);
 			
+			for(int i =0; i<availableMatches.size();i++) {
+				if(availableMatches.get(i).getMatchID() == matchID) {
+					availableMatches.remove(i);
+					break;
+				}
+			}
+			
 			System.out.println("Bet made with bookie " + bookieID + "on match with ID: "+ matchID);
 		} else {
 			System.out.println("Bet rejected. Bookie returned the following info: ");
