@@ -140,8 +140,8 @@ public class GamblerServer extends RemoteControllableServer {
 	}
 	
 	@RMI
-	public String endBetPhase(int matchID, String winningTeam, float payout) {
-		for(Bet bet : gambler.bets) {
+	public String endBetPhase(String bookieID, int matchID, String winningTeam, float payout) {
+		/*for(Bet bet : gambler.bets) {
 			if(bet.getMatchID() == matchID) {
 				if(bet.getTeam().equals(winningTeam)) {
 					//Have to round since payout is a float and the wallet contains int
@@ -152,14 +152,24 @@ public class GamblerServer extends RemoteControllableServer {
 				//matchID is unique
 				break;
 			}
-			
-			
-		}
+		}*/
 		
+		int money=Math.round(payout);
+		if(money>0) {
+			gambler.fillWallet(money);
+		}
+		System.out.println("Match: " + matchID + " finished. You earned "+ money+ " !");
 		//Cleanup
 		for(int i = 0;i<gambler.bets.size();i++) {
 			if(gambler.bets.get(i).getMatchID() == matchID) {
 				gambler.bets.remove(i);
+			}
+		}
+		//deletes available match?
+		for(AvailableMatch match : gambler.availableMatches) {
+			if (match.getMatchID()==matchID) {
+				gambler.availableMatches.remove(match);
+				break;
 			}
 		}
 		return "endBetPhase method received by: " + gambler.getGamblerID();

@@ -108,4 +108,5 @@ public class BookieConnection extends JsonRpcConnection {
 	}
 	// TODO insert all methods required to communicate with a bookie
 	
+	
 }
